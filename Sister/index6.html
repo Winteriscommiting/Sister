@@ -44,9 +44,13 @@
     .sig{font-size:clamp(18px,2.4vw,32px);font-weight:800;color:#ffe4e6;text-align:center;margin-top:20px;text-shadow:0 0 20px rgba(255,228,230,.8)}
     .emoji{font-size:clamp(64px,10vw,120px);text-align:center;filter:drop-shadow(0 0 14px rgba(255,215,0,.8))}
 
-    .fw{position:fixed;width:4px;height:4px;background:currentColor;border-radius:50%;box-shadow:0 0 12px 3px currentColor;animation:fw 1.05s ease-out forwards;z-index:30}
-    @keyframes fw{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--tx),var(--ty));opacity:0}}
-    .hidden{display:none!important}
+  .fw{position:fixed;width:4px;height:4px;background:currentColor;border-radius:50%;box-shadow:0 0 12px 3px currentColor;animation:fw 1.05s ease-out forwards;z-index:30}
+  @keyframes fw{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--tx),var(--ty));opacity:0}}
+  .hidden{display:none!important}
+  /* Mid-game surprise overlay */
+  #midWish.modal{background:rgba(0,0,0,.55)}
+  .midTitle{font-size:clamp(22px,4vw,36px);font-weight:800;margin:0 0 8px;text-align:center}
+  .midMsg{font-size:clamp(14px,2vw,20px);text-align:center;opacity:.95}
   </style>
 </head>
 <body>
@@ -85,8 +89,17 @@
     <div id="card">
       <div class="emoji">🎁🎉</div>
       <div class="title">HAPPY BIRTHDAY <span id="who"></span>!</div>
-      <div class="msg">Memory master! You found all pairs. Wishing you a year full of fun surprises! ✨</div>
+      <div class="msg">Memory master! You found all pairs — what a champion! ✨ May your year be packed with laughter, dream-chasing energy, cozy chai, scenic drives, new adventures, and endless smiles. You’ve got this, today and every day. Keep shining, Superstar! 🌟</div>
       <div class="sig">From thambi..! 🫷</div>
+    </div>
+  </div>
+
+  <!-- Mid‑game surprise -->
+  <div id="midWish" class="modal hidden">
+    <div class="panel">
+      <div class="emoji">🎊💖</div>
+      <h3 class="midTitle">A tiny surprise for <span id="midWho"></span>…</h3>
+      <div class="midMsg">Happy Birthday! You’re doing amazing — take a breath, soak in the joy, and keep going… the best is yet to come! 🎉</div>
     </div>
   </div>
 
@@ -103,13 +116,16 @@
     const celebrate = document.getElementById('celebrate');
     const whoEl = document.getElementById('who');
   const changeNameBtn = document.getElementById('changeName');
+  const midWish = document.getElementById('midWish');
+  const midWho = document.getElementById('midWho');
 
     const ICONS = ['💎','⭐','🍬','🌸','🧁','❤️','🎈','🍫','🪄','🌟','🍰','🎀'];
     const COLS = 6, ROWS = 4; // 12 pairs => 24 cards
 
     let cards = []; // [{icon, id, matched, el}]
     let first = null, second = null;
-    let moves = 0; let running = false; let startTime = 0; let timerId = null;
+  let moves = 0; let running = false; let startTime = 0; let timerId = null;
+  let midTimer = null; let midShown = false; let elapsedBeforePause = 0;
     let playerName = '';
 
     function samplePairs(){
@@ -166,6 +182,7 @@
     function checkWin(){
       if (cards.every(c=>c.matched)) {
         running = false; clearInterval(timerId);
+        if (midTimer) { clearTimeout(midTimer); midTimer = null; }
         if (playerName) whoEl.textContent = ' ' + playerName.toUpperCase();
         celebrate.style.display='grid';
         // extra burst center
@@ -175,12 +192,35 @@
     }
 
     function startGame(){
-      moves = 0; movesEl.textContent = moves; timeEl.textContent = 0; running = true; startTime = Date.now();
+      moves = 0; movesEl.textContent = moves; timeEl.textContent = 0; running = true; startTime = Date.now(); elapsedBeforePause = 0; midShown = false;
       clearInterval(timerId); timerId = setInterval(()=>{ timeEl.textContent = Math.floor((Date.now()-startTime)/1000); }, 250);
+      scheduleMidWish();
       renderBoard();
     }
 
-    function resetGame(){ running = false; clearInterval(timerId); renderBoard(); movesEl.textContent = 0; timeEl.textContent = 0; first = second = null; celebrate.style.display='none'; }
+    function resetGame(){ running = false; clearInterval(timerId); if (midTimer) clearTimeout(midTimer); midShown=false; renderBoard(); movesEl.textContent = 0; timeEl.textContent = 0; first = second = null; celebrate.style.display='none'; }
+
+    function scheduleMidWish(){ if (midTimer) clearTimeout(midTimer); const delay = 10000 + Math.random()*10000; midTimer = setTimeout(showMidWish, delay); }
+    function showMidWish(){
+      if (midShown || !running) return;
+      midShown = true;
+      // Pause timer and gameplay
+      clearInterval(timerId);
+      elapsedBeforePause = Date.now() - startTime;
+      running = false;
+      if (playerName) midWho.textContent = ' ' + playerName;
+      midWish.classList.remove('hidden');
+      confettiBurst({x: innerWidth*0.5, y: innerHeight*0.35});
+      setTimeout(hideMidWish, 4500);
+    }
+    function hideMidWish(){
+      midWish.classList.add('hidden');
+      // Resume timer and gameplay
+      startTime = Date.now() - elapsedBeforePause;
+      running = true;
+      clearInterval(timerId);
+      timerId = setInterval(()=>{ timeEl.textContent = Math.floor((Date.now()-startTime)/1000); }, 250);
+    }
 
     function getName(){ const p = new URLSearchParams(location.search); const n = (p.get('n')||'').trim(); if (n) return n.substring(0,40); const ls=(localStorage.getItem('playerName')||'').trim(); if (ls) return ls.substring(0,40); return ''; }
     function setName(n){
@@ -192,8 +232,8 @@
       }
     }
 
-    // Init name
-  (function init(){ const n = getName(); if (n){ setName(n); } else { nameModal.classList.remove('hidden'); nameInput.focus(); } })();
+    // Init name: always prompt each time (prefill if known)
+  (function init(){ const n = getName(); if (n){ nameInput.value = n; } nameModal.classList.remove('hidden'); nameInput.focus(); })();
     nameSave.addEventListener('click', ()=>{ const n=nameInput.value; if(!n.trim()) { nameInput.focus(); return; } nameModal.classList.add('hidden'); setName(n); });
     nameInput.addEventListener('keydown', e=>{ if (e.key==='Enter') nameSave.click(); });
 
