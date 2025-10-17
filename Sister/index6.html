@@ -15,9 +15,9 @@
     .pill{padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(6px);font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.6)}
   .spacer{flex:1}
   .actions{display:flex;gap:8px}
-    .grid{display:grid;place-content:center;padding:20px;gap:12px;grid-template-columns:repeat(6, minmax(60px, 110px))}
-    .card{width:100%;aspect-ratio:3/4;position:relative;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.2,.8,.2,1);cursor:pointer}
-    .face{position:absolute;inset:0;border-radius:14px;display:grid;place-items:center;font-size:clamp(22px, 5vw, 40px);backface-visibility:hidden}
+  .grid{display:grid;place-content:center;padding:20px;gap:12px;grid-template-columns:repeat(6, minmax(60px, 110px));perspective:1000px}
+  .card{width:100%;aspect-ratio:3/4;position:relative;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+  .face{position:absolute;inset:0;border-radius:14px;display:grid;place-items:center;font-size:clamp(22px, 5vw, 40px);-webkit-backface-visibility:hidden;backface-visibility:hidden}
     .front{background:linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 30px rgba(0,0,0,.35)}
     .back{transform:rotateY(180deg);background:radial-gradient(60% 60% at 40% 30%, rgba(255,255,255,.88), rgba(255,255,255,.22));border:1px solid rgba(255,255,255,.3);box-shadow:0 10px 30px rgba(0,0,0,.45);color:#000}
     .card.flipped{transform:rotateY(180deg)}
@@ -38,7 +38,7 @@
     #celebrate{position:fixed;inset:0;display:none;place-items:center;background:radial-gradient(circle at 50% 40%, #3a0050 0%, #12001a 55%, #000 100%);z-index:20;overflow:hidden}
     #card{max-width:1000px;margin:0 24px;padding:48px;border-radius:28px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.28);backdrop-filter:blur(26px);box-shadow:0 30px 80px rgba(0,0,0,.6), inset 0 0 40px rgba(255,255,255,.06);animation:float 4.2s ease-in-out infinite}
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-    .title{font-size:clamp(40px,7vw,90px);font-weight:900;letter-spacing:.04em;text-align:center;margin-bottom:10px;background:linear-gradient(45deg,var(--gold),#fff,var(--gold));background-size:200% 200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s ease-in-out infinite;text-shadow:0 0 30px rgba(255,215,0,.5)}
+  .title{font-size:clamp(40px,7vw,90px);font-weight:900;letter-spacing:.04em;text-align:center;margin-bottom:10px;color:var(--gold);animation:shine 3s ease-in-out infinite;text-shadow:0 0 30px rgba(255,215,0,.5)}
     @keyframes shine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
     .msg{font-size:clamp(16px,2.2vw,28px);text-align:center;line-height:1.8;text-shadow:0 2px 8px rgba(0,0,0,.5)}
     .sig{font-size:clamp(18px,2.4vw,32px);font-weight:800;color:#ffe4e6;text-align:center;margin-top:20px;text-shadow:0 0 20px rgba(255,228,230,.8)}
@@ -47,14 +47,16 @@
   .fw{position:fixed;width:4px;height:4px;background:currentColor;border-radius:50%;box-shadow:0 0 12px 3px currentColor;animation:fw 1.05s ease-out forwards;z-index:30}
   @keyframes fw{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--tx),var(--ty));opacity:0}}
   .hidden{display:none!important}
-  /* Mid-game surprise overlay */
-  #midWish.modal{background:rgba(0,0,0,.55)}
-  .midTitle{font-size:clamp(22px,4vw,36px);font-weight:800;margin:0 0 8px;text-align:center}
-  .midMsg{font-size:clamp(14px,2vw,20px);text-align:center;opacity:.95}
+  /* Mid-game surprise overlay removed */
   /* Persistent surprise layer */
-  #surprise{position:fixed;inset:0;display:none;pointer-events:none;z-index:15}
-  #surprise .hbTitle{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:clamp(32px,7vw,88px);font-weight:900;letter-spacing:.04em;text-align:center;background:linear-gradient(45deg,var(--gold),#fff,var(--gold));background-size:200% 200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3.2s ease-in-out infinite;text-shadow:0 0 30px rgba(255,215,0,.5)}
-  #surprise .wishLong{position:absolute;top:calc(6% + clamp(40px,7vw,90px));left:50%;transform:translateX(-50%);max-width:min(900px,92vw);padding:8px 12px;text-align:center;font-size:clamp(14px,2.2vw,22px);opacity:.95;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+  #surprise{position:fixed;inset:0;display:none;pointer-events:none;z-index:15;background:rgba(0,0,0,.25);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  #surprise .hbTitle{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:clamp(32px,7vw,88px);font-weight:900;letter-spacing:.04em;text-align:center;color:var(--gold);animation:shine 3.2s ease-in-out infinite;text-shadow:0 0 30px rgba(255,215,0,.5);z-index:1}
+  @supports (-webkit-background-clip: text) or (background-clip: text){
+    .title{background:linear-gradient(45deg,var(--gold),#fff,var(--gold));background-size:200% 200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+    #surprise .hbTitle{background:linear-gradient(45deg,var(--gold),#fff,var(--gold));background-size:200% 200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  }
+  #surprise .wishLong{position:absolute;top:calc(6% + clamp(46px,7vw,98px));left:50%;transform:translateX(-50%);max-width:min(900px,92vw);padding:12px 16px;text-align:center;font-size:clamp(14px,2.2vw,22px);color:#fff;opacity:.98;text-shadow:0 2px 10px rgba(0,0,0,.65);background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);border-radius:14px;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);z-index:2;animation:wishIn .6s ease-out both}
+  @keyframes wishIn{0%{opacity:0;transform:translate(-50%, 8px)}100%{opacity:1;transform:translate(-50%, 0)}}
   #surprise .cake{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:min(360px,80vw);height:160px}
   .cake .plate{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;height:16px;background:linear-gradient(180deg,#bbb,#888);border-radius:10px}
   .cake .layer{position:absolute;left:50%;transform:translateX(-50%);width:90%;height:46px;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.3)}
@@ -138,14 +140,7 @@
     </div>
   </div>
 
-  <!-- Mid‑game surprise -->
-  <div id="midWish" class="modal hidden">
-    <div class="panel">
-      <div class="emoji">🎊💖</div>
-      <h3 class="midTitle">A tiny surprise for <span id="midWho"></span>…</h3>
-      <div class="midMsg">Happy Birthday! You’re doing amazing — take a breath, soak in the joy, and keep going… the best is yet to come! 🎉</div>
-    </div>
-  </div>
+  
 
   <script>
     const grid = document.getElementById('grid');
@@ -164,8 +159,7 @@
     const surpriseName = document.getElementById('surpriseName');
     const rocketsEl = document.getElementById('rockets');
     const floatersEl = document.getElementById('floaters');
-  const midWish = document.getElementById('midWish');
-  const midWho = document.getElementById('midWho');
+  // removed old mid-game modal elements
 
     const ICONS = ['💎','⭐','🍬','🌸','🧁','❤️','🎈','🍫','🪄','🌟','🍰','🎀'];
     const COLS = 6, ROWS = 4; // 12 pairs => 24 cards
@@ -173,7 +167,7 @@
     let cards = []; // [{icon, id, matched, el}]
     let first = null, second = null;
   let moves = 0; let running = false; let startTime = 0; let timerId = null;
-  let midTimer = null; let midShown = false; let elapsedBeforePause = 0;
+  let lock = false; // prevent flipping more than 2 at once
   let surpriseShown = false; let rocketTimer=null; let floaterTimer=null; let confettiTimer=null;
     let playerName = '';
 
@@ -202,7 +196,7 @@
     }
 
     function onFlip(el, card){
-      if (!running || card.matched || el.classList.contains('flipped')) return;
+      if (!running || lock || card.matched || el.classList.contains('flipped')) return;
       el.classList.add('flipped');
       if (!first) { first = card; return; }
       if (first === card) return;
@@ -215,8 +209,8 @@
         maybeShowSurprise();
         first = second = null; checkWin();
       } else {
-        const a = first.el, b = second.el; first = second = null;
-        setTimeout(()=>{ a.classList.remove('flipped'); b.classList.remove('flipped'); }, 700);
+        const a = first.el, b = second.el; first = second = null; lock = true;
+        setTimeout(()=>{ a.classList.remove('flipped'); b.classList.remove('flipped'); lock = false; }, 700);
       }
     }
 
@@ -232,7 +226,6 @@
     function checkWin(){
       if (cards.every(c=>c.matched)) {
         running = false; clearInterval(timerId);
-        if (midTimer) { clearTimeout(midTimer); midTimer = null; }
         if (playerName) whoEl.textContent = ' ' + playerName.toUpperCase();
         celebrate.style.display='grid';
         // extra burst center
@@ -268,48 +261,26 @@
     }
 
     function startGame(){
-      moves = 0; movesEl.textContent = moves; timeEl.textContent = 0; running = true; startTime = Date.now(); elapsedBeforePause = 0; midShown = false;
+      moves = 0; movesEl.textContent = moves; timeEl.textContent = 0; running = true; startTime = Date.now(); lock = false;
       clearInterval(timerId); timerId = setInterval(()=>{ timeEl.textContent = Math.floor((Date.now()-startTime)/1000); }, 250);
-      scheduleMidWish();
       renderBoard();
     }
 
-    function resetGame(){ running = false; clearInterval(timerId); if (midTimer) clearTimeout(midTimer); midShown=false; renderBoard(); movesEl.textContent = 0; timeEl.textContent = 0; first = second = null; celebrate.style.display='none'; }
+  function resetGame(){ running = false; clearInterval(timerId); renderBoard(); movesEl.textContent = 0; timeEl.textContent = 0; first = second = null; lock=false; celebrate.style.display='none'; }
 
-    function scheduleMidWish(){ if (midTimer) clearTimeout(midTimer); const delay = 10000 + Math.random()*10000; midTimer = setTimeout(showMidWish, delay); }
-    function showMidWish(){
-      if (midShown || !running) return;
-      midShown = true;
-      // Pause timer and gameplay
-      clearInterval(timerId);
-      elapsedBeforePause = Date.now() - startTime;
-      running = false;
-      if (playerName) midWho.textContent = ' ' + playerName;
-      midWish.classList.remove('hidden');
-      confettiBurst({x: innerWidth*0.5, y: innerHeight*0.35});
-      setTimeout(hideMidWish, 4500);
-    }
-    function hideMidWish(){
-      midWish.classList.add('hidden');
-      // Resume timer and gameplay
-      startTime = Date.now() - elapsedBeforePause;
-      running = true;
-      clearInterval(timerId);
-      timerId = setInterval(()=>{ timeEl.textContent = Math.floor((Date.now()-startTime)/1000); }, 250);
-    }
+    // old timed mid-game modal removed
 
-    function getName(){ const p = new URLSearchParams(location.search); const n = (p.get('n')||'').trim(); if (n) return n.substring(0,40); const ls=(localStorage.getItem('playerName')||'').trim(); if (ls) return ls.substring(0,40); return ''; }
+  // Name is asked on every visit; not persisted between sessions
     function setName(n){
       playerName = (n||'').trim().substring(0,40);
       if (playerName){
-        localStorage.setItem('playerName', playerName);
         playerEl.textContent = playerName;
         document.title = 'Card Garden — ' + playerName;
       }
     }
 
     // Init name: always prompt each time (prefill if known)
-  (function init(){ const n = getName(); if (n){ nameInput.value = n; } nameModal.classList.remove('hidden'); nameInput.focus(); })();
+  (function init(){ nameInput.value = ''; nameModal.classList.remove('hidden'); nameInput.focus(); })();
     nameSave.addEventListener('click', ()=>{ const n=nameInput.value; if(!n.trim()) { nameInput.focus(); return; } nameModal.classList.add('hidden'); setName(n); });
     nameInput.addEventListener('keydown', e=>{ if (e.key==='Enter') nameSave.click(); });
 
