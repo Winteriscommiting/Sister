@@ -35,8 +35,6 @@
     </form>
   </div>
 
-  <script src="db-config.js"></script>
-  <script src="db.js"></script>
   <script>
     (function(){
       var input = document.getElementById('name');
@@ -58,8 +56,6 @@
         var v = (input.value||'').trim().slice(0,40);
         if(!v){ input.focus(); e.preventDefault(); return; }
         try{ localStorage.setItem('playerName', v); }catch(err){}
-        // Fire-and-forget: record/update user
-        if (window.DB && DB.addOrUpdateUser){ DB.addOrUpdateUser(v, { source: 'welcome-form' }); }
         // Let the form submit normally to index6.html?n=...
       });
 
@@ -68,7 +64,6 @@
           var v = known || (input.value||'').trim().slice(0,40);
           if (!v) { input.focus(); return; }
           try{ localStorage.setItem('playerName', v); }catch(err){}
-          if (window.DB && DB.addOrUpdateUser){ DB.addOrUpdateUser(v, { source: 'welcome-continue' }); }
           location.href = 'index6.html?n=' + encodeURIComponent(v);
         });
       }

@@ -91,8 +91,6 @@
     </div>
   </div>
 
-  <script src="db-config.js"></script>
-  <script src="db.js"></script>
   <script>
     const grid = document.getElementById('grid');
     const startBtn = document.getElementById('startBtn');
@@ -174,11 +172,7 @@
         celebrate.style.display='grid';
         // extra burst center
         confettiBurst({x: innerWidth*0.5, y: innerHeight*0.35});
-        // Record session (fire-and-forget)
-        if (window.DB && DB.addSession){
-          const timeSeconds = parseInt(timeEl.textContent, 10) || 0;
-          DB.addSession(playerName, { moves: moves, timeSeconds: timeSeconds, game: 'memory' });
-        }
+        // database removed; no session recording
       }
     }
 
@@ -197,8 +191,6 @@
         localStorage.setItem('playerName', playerName);
         playerEl.textContent = playerName;
         document.title = 'Card Garden — ' + playerName;
-        // Upsert user record once name is known
-        if (window.DB && DB.addOrUpdateUser){ DB.addOrUpdateUser(playerName, { source: 'game' }); }
       }
     }
 

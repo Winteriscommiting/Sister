@@ -4,9 +4,6 @@ index3.html
 index4.html
 index5.html
 
-# Local Firebase config (contains secrets)
-db-config.js
-
 # OS/editor artifacts
 .DS_Store
 Thumbs.db
