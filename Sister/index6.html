@@ -57,7 +57,6 @@
       <div class="pill">Player: <span id="player">—</span></div>
       <div class="spacer"></div>
       <div class="actions">
-        <a id="backLink" class="btn btnSmall" href="index.html">Back to Welcome</a>
         <button id="changeName" class="btn btnSmall" type="button">Change name</button>
       </div>
     </header>
@@ -104,7 +103,6 @@
     const celebrate = document.getElementById('celebrate');
     const whoEl = document.getElementById('who');
   const changeNameBtn = document.getElementById('changeName');
-  const backLink = document.getElementById('backLink');
 
     const ICONS = ['💎','⭐','🍬','🌸','🧁','❤️','🎈','🍫','🪄','🌟','🍰','🎀'];
     const COLS = 6, ROWS = 4; // 12 pairs => 24 cards
@@ -195,17 +193,15 @@
     }
 
     // Init name
-  (function init(){ const n = getName(); if (n){ setName(n); } else { nameModal.classList.remove('hidden'); nameInput.focus(); } updateBackLink(); })();
+  (function init(){ const n = getName(); if (n){ setName(n); } else { nameModal.classList.remove('hidden'); nameInput.focus(); } })();
     nameSave.addEventListener('click', ()=>{ const n=nameInput.value; if(!n.trim()) { nameInput.focus(); return; } nameModal.classList.add('hidden'); setName(n); });
     nameInput.addEventListener('keydown', e=>{ if (e.key==='Enter') nameSave.click(); });
 
     startBtn.addEventListener('click', ()=>{ if (!playerName){ nameModal.classList.remove('hidden'); nameInput.focus(); return; } startGame(); });
     resetBtn.addEventListener('click', resetGame);
 
-  function updateBackLink(){ if (playerName){ backLink.href = 'index.html?n=' + encodeURIComponent(playerName); } }
   changeNameBtn.addEventListener('click', ()=>{ nameModal.classList.remove('hidden'); nameInput.value = playerName; nameInput.focus(); });
-  // Update link whenever name saved
-  nameSave.addEventListener('click', updateBackLink);
+  // No welcome page; back link removed
   </script>
 </body>
 </html>
