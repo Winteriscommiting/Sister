@@ -51,6 +51,31 @@
   #midWish.modal{background:rgba(0,0,0,.55)}
   .midTitle{font-size:clamp(22px,4vw,36px);font-weight:800;margin:0 0 8px;text-align:center}
   .midMsg{font-size:clamp(14px,2vw,20px);text-align:center;opacity:.95}
+  /* Persistent surprise layer */
+  #surprise{position:fixed;inset:0;display:none;pointer-events:none;z-index:15}
+  #surprise .hbTitle{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:clamp(32px,7vw,88px);font-weight:900;letter-spacing:.04em;text-align:center;background:linear-gradient(45deg,var(--gold),#fff,var(--gold));background-size:200% 200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3.2s ease-in-out infinite;text-shadow:0 0 30px rgba(255,215,0,.5)}
+  #surprise .wishLong{position:absolute;top:calc(6% + clamp(40px,7vw,90px));left:50%;transform:translateX(-50%);max-width:min(900px,92vw);padding:8px 12px;text-align:center;font-size:clamp(14px,2.2vw,22px);opacity:.95;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+  #surprise .cake{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:min(360px,80vw);height:160px}
+  .cake .plate{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;height:16px;background:linear-gradient(180deg,#bbb,#888);border-radius:10px}
+  .cake .layer{position:absolute;left:50%;transform:translateX(-50%);width:90%;height:46px;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+  .cake .layer.top{bottom:100px;background:linear-gradient(180deg,#ffe4ec,#ffb3c7)}
+  .cake .layer.mid{bottom:58px;background:linear-gradient(180deg,#fff2b3,#ffd36b)}
+  .cake .layer.bot{bottom:16px;background:linear-gradient(180deg,#c9f7ff,#72e4ff)}
+  .cake .drip{position:absolute;width:14px;height:18px;background:rgba(255,255,255,.9);border-radius:8px}
+  .cake .d1{left:22%}
+  .cake .d2{left:58%}
+  .cake .candles{position:absolute;bottom:136px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+  .cake .candle{width:10px;height:28px;background:#fff;border-radius:4px;position:relative}
+  .cake .flame{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:10px;height:14px;border-radius:10px;background:radial-gradient(circle,#ffd700 0%, #ff7b00 70%, transparent 71%);filter:drop-shadow(0 0 10px rgba(255,200,0,.9));animation:flicker .8s ease-in-out infinite}
+  @keyframes flicker{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.2)}}
+  #rockets, #floaters{position:absolute;inset:0;overflow:hidden}
+  .rocket{position:absolute;font-size:28px;filter:drop-shadow(0 0 8px rgba(255,255,255,.8))}
+  .flyR{animation:flyR 5.5s linear forwards}
+  .flyL{animation:flyL 5.5s linear forwards}
+  @keyframes flyR{0%{transform:translateX(-80px) rotate(20deg)}100%{transform:translateX(calc(100vw + 80px)) rotate(20deg)}}
+  @keyframes flyL{0%{transform:translateX(calc(100vw + 80px)) rotate(-20deg)}100%{transform:translateX(-80px) rotate(-20deg)}}
+  .floater{position:absolute;font-weight:900;font-size:clamp(16px,3vw,28px);text-shadow:0 4px 12px rgba(0,0,0,.6);animation:floatUp 6s ease-in forwards}
+  @keyframes floatUp{0%{transform:translateY(40px);opacity:.0}20%{opacity:1}100%{transform:translateY(-220px);opacity:0}}
   </style>
 </head>
 <body>
@@ -70,6 +95,25 @@
     <div class="bar">
       <button class="btn" id="startBtn">Start Game</button>
       <button class="btn" id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <!-- Persistent Surprise Layer (stays visible) -->
+  <div id="surprise">
+    <div id="rockets"></div>
+    <div id="floaters"></div>
+    <div class="hbTitle">HAPPY BIRTHDAY <span id="surpriseName"></span>!</div>
+    <div class="wishLong">Wishing you a day that sparkles, a year that glows, and a lifetime that shines. May your journey be filled with kind people, fearless choices, unexpected victories, warm sunsets, long chats, cozy rain, and the courage to dream bigger every time. You’re loved more than words — today and always. ✨</div>
+    <div class="cake">
+      <div class="plate"></div>
+  <div class="layer top"><span class="drip d1"></span><span class="drip d2"></span></div>
+      <div class="layer mid"></div>
+      <div class="layer bot"></div>
+      <div class="candles">
+        <div class="candle"><div class="flame"></div></div>
+        <div class="candle"><div class="flame"></div></div>
+        <div class="candle"><div class="flame"></div></div>
+      </div>
     </div>
   </div>
 
@@ -116,6 +160,10 @@
     const celebrate = document.getElementById('celebrate');
     const whoEl = document.getElementById('who');
   const changeNameBtn = document.getElementById('changeName');
+    const surprise = document.getElementById('surprise');
+    const surpriseName = document.getElementById('surpriseName');
+    const rocketsEl = document.getElementById('rockets');
+    const floatersEl = document.getElementById('floaters');
   const midWish = document.getElementById('midWish');
   const midWho = document.getElementById('midWho');
 
@@ -126,6 +174,7 @@
     let first = null, second = null;
   let moves = 0; let running = false; let startTime = 0; let timerId = null;
   let midTimer = null; let midShown = false; let elapsedBeforePause = 0;
+  let surpriseShown = false; let rocketTimer=null; let floaterTimer=null; let confettiTimer=null;
     let playerName = '';
 
     function samplePairs(){
@@ -163,6 +212,7 @@
         first.matched = second.matched = true;
         first.el.classList.add('matched'); second.el.classList.add('matched');
         confettiBurst(centerOf(first.el)); confettiBurst(centerOf(second.el));
+        maybeShowSurprise();
         first = second = null; checkWin();
       } else {
         const a = first.el, b = second.el; first = second = null;
@@ -189,6 +239,32 @@
         confettiBurst({x: innerWidth*0.5, y: innerHeight*0.35});
         // database removed; no session recording
       }
+    }
+
+    function matchedPairs(){ return cards.filter(c=>c.matched).length / 2; }
+    function maybeShowSurprise(){ if (!surpriseShown && matchedPairs() >= 4){ showSurprise(); } }
+    function showSurprise(){
+      surpriseShown = true;
+      if (playerName) { surpriseName.textContent = ' ' + playerName.toUpperCase(); }
+      surprise.style.display = 'block'; // persistent layer stays
+      rocketTimer = setInterval(spawnRocket, 2800);
+      floaterTimer = setInterval(spawnFloater, 1800);
+      confettiTimer = setInterval(()=>{ confettiBurst({x: Math.random()*innerWidth, y: innerHeight*0.3 + Math.random()*innerHeight*0.4}); }, 2200);
+      for (let i=0;i<2;i++){ setTimeout(spawnRocket, i*600); setTimeout(spawnFloater, i*500); }
+    }
+    function spawnRocket(){
+      const r = document.createElement('div'); r.className='rocket'; r.textContent = Math.random()<0.5 ? '🚀' : '🧨';
+      const dirRight = Math.random() < 0.5; r.classList.add(dirRight? 'flyR':'flyL');
+      r.style.top = (10 + Math.random()*60) + 'vh';
+      r.style.left = dirRight? '-60px' : 'calc(100vw + 60px)';
+      rocketsEl.appendChild(r); r.addEventListener('animationend', ()=> r.remove());
+    }
+    function spawnFloater(){
+      const f = document.createElement('div'); f.className='floater';
+      const phrases = ['Happy Birthday','Shine On ✨','Lots of Love 💖','Celebrate 🎉','Dream Big 🌟', (playerName? ('For '+playerName) : 'To You')];
+      f.textContent = phrases[(Math.random()*phrases.length)|0];
+      f.style.left = (10 + Math.random()*80) + 'vw'; f.style.bottom = '5vh';
+      floatersEl.appendChild(f); setTimeout(()=> f.remove(), 6500);
     }
 
     function startGame(){
