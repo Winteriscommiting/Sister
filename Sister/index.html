@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome</title>
+  <style>
+    :root { --accent:#ff00ff; --cyan:#00ffff; }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;display:grid;place-items:center;background:radial-gradient(1000px 520px at 50% 30%, #1c0134, #0b0213 60%, #000 100%);color:#fff}
+    .panel{max-width:560px;margin:0 24px;padding:28px;border-radius:20px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.28);backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,.55)}
+    h1{margin:0 0 6px;font-size:28px}
+    p{margin:0 0 16px;opacity:.9}
+    form{display:flex;gap:10px}
+    input[type="text"]{flex:1;min-width:0;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.35);color:#fff;outline:none;-webkit-user-select:text;user-select:text}
+    .btn{padding:12px 16px;border-radius:12px;border:2px solid var(--accent);background:linear-gradient(45deg, rgba(255,0,255,.2), rgba(0,255,255,.2));color:#fff;font-weight:800;letter-spacing:.04em;cursor:pointer;-webkit-user-select:none;user-select:none;box-shadow:0 0 30px rgba(255,0,255,.35), inset 0 0 18px rgba(255,255,255,.15)}
+    .hint{margin:8px 0 16px; font-size:14px; opacity:.85}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .hidden{display:none!important}
+    .ghost{border-style:dashed; opacity:.9}
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Welcome</h1>
+    <p class="hint">A relaxing memory game. Flip cards to find matching pairs. The surprise appears when you complete the board ✨</p>
+  <div id="knownRow" class="row hidden">
+      <button id="continueBtn" class="btn" type="button">Continue as <span id="knownName"></span></button>
+      <button id="changeBtn" class="btn ghost" type="button">Change name</button>
+    </div>
+    <form id="f" action="index6.html" method="get">
+      <input id="name" name="n" type="text" maxlength="40" placeholder="Your name" />
+      <button class="btn" type="submit">Continue</button>
+    </form>
+  </div>
+
+  <script src="db-config.js"></script>
+  <script src="db.js"></script>
+  <script>
+    (function(){
+      var input = document.getElementById('name');
+      // Prefill from query or localStorage
+      var q = new URLSearchParams(location.search).get('n') || '';
+      var ls = localStorage.getItem('playerName') || '';
+      var known = (q || ls || '').trim().slice(0,40);
+      var knownRow = document.getElementById('knownRow');
+      var knownName = document.getElementById('knownName');
+      var continueBtn = document.getElementById('continueBtn');
+      var changeBtn = document.getElementById('changeBtn');
+      if (known){
+        knownName.textContent = known;
+        knownRow.classList.remove('hidden');
+        input.value = known;
+      }
+      input.focus();
+      document.getElementById('f').addEventListener('submit', function(e){
+        var v = (input.value||'').trim().slice(0,40);
+        if(!v){ input.focus(); e.preventDefault(); return; }
+        try{ localStorage.setItem('playerName', v); }catch(err){}
+        // Fire-and-forget: record/update user
+        if (window.DB && DB.addOrUpdateUser){ DB.addOrUpdateUser(v, { source: 'welcome-form' }); }
+        // Let the form submit normally to index6.html?n=...
+      });
+
+      if (continueBtn){
+        continueBtn.addEventListener('click', function(){
+          var v = known || (input.value||'').trim().slice(0,40);
+          if (!v) { input.focus(); return; }
+          try{ localStorage.setItem('playerName', v); }catch(err){}
+          if (window.DB && DB.addOrUpdateUser){ DB.addOrUpdateUser(v, { source: 'welcome-continue' }); }
+          location.href = 'index6.html?n=' + encodeURIComponent(v);
+        });
+      }
+      if (changeBtn){ changeBtn.addEventListener('click', function(){ input.focus(); }); }
+    })();
+  </script>
+</body>
+</html>
